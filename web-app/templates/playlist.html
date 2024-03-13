@@ -1,0 +1,110 @@
+    {% extends "base.html" %}
+
+    {% block main %}
+    <h1>Hello, {{ user }}!</h1>
+    <h1>Here is a playlist for you!</h1>
+    <p>This playlist is constructed based on the artists and genres that you had listened the most in the last month. </p>
+    <p>It is also fully-customizable using the audio features that you can select with the bars given below. The genre selection part shows your top 3 most listened genres of this month. Pick a genre and start playing with the features of your playlist!</p>
+    <br>
+
+
+    <div class="playlists">
+    <h2>Your Own Customized Playlist</h2>
+    <h2 class="new-way">Genre: {{ top_genre }} </h2>
+    <h2 class="new-way">{{ description }}</h2>
+    {% for item in track_names %}
+    <p>{{item.decode('utf-8')}}</p>
+    {% endfor %}
+    
+    <br>
+    <br>
+
+    <h2>Save Playlist</h2>
+    <p>You can give your playlist a name and save it to your Spotify library.</p>
+    <form action="{{ url_for('save_playlist') }}" method="post">
+    <label for="playlist-name">Playlist Name:</label>
+    <input type="text" name="playlist-name">
+    <input type="text" name="tracks" value='{{ track_ids }}' class="hidden">
+    <input type="submit" name="Save Playlist" value="Save Playlist"  class="btn btn-sm btn-primary">
+    </form>
+    <br>
+    <br>
+    <h2>Playlist Features</h2>
+    <p>You can choose one of your most listened genres and use the bars below to arrange the features of your playlist.</p>
+
+    <ul>
+        <li>Danceability: Describes how suitable a track is for dancing based on a combination of musical elements including tempo, rhythm stability, beat strength, and overall regularity.</li>
+        <li>Energy: Represents a perceptual measure of intensity and activity. Typically, energetic tracks feel fast, loud, and noisy. For example, death metal has high energy, while a Bach prelude scores low on the scale. Perceptual features contributing to this attribute include dynamic range, perceived loudness, timbre, onset rate, and general entropy. </li>
+        <li>Speechiness: Detects the presence of spoken words in a track. Higher values describe tracks that may contain both music and speech, either in sections or layered, including such cases as rap music. </li>
+        <li>Acousticness: Measures whether the track is acoustic. </li>
+        <li>Instrumentalness: Predicts whether a track contains no vocals. “Ooh” and “aah” sounds are treated as instrumental in this context. Rap or spoken word tracks are clearly “vocal”. </li>
+        <li>Liveness: Detects the presence of an audience in the recording. Higher liveness values represent an increased probability that the track was performed live.</li>
+        <li>Valence: Describes the musical positiveness conveyed by a track. Tracks with high valence sound more positive (e.g. happy, cheerful, euphoric), while tracks with low valence sound more negative (e.g. sad, depressed, angry). </li>
+        <li>Tempo: Estimates tempo of a track in beats per minute (BPM). In musical terminology, tempo is the speed or pace of a given piece and derives directly from the average beat duration. </li>
+    </ul>
+
+    <br>
+    <br>
+    <div>
+    <script type="text/javascript">
+        window.onload = function() {
+            // document.getElementById("genre1").checked = true;
+            console.log("{{ features }}")
+            var top_genre = "{{ top_genre }}";
+            var genre1 = "{{ top_genres[0] }}";
+            var genre2 = "{{ top_genres[1] }}";
+            var genre3 = "{{ top_genres[2] }}";
+            //console.log(top_genre);
+            checkRadio(top_genre, genre1, genre2, genre3);
+        };
+        function checkRadio(top_genre, genre1, genre2, genre3) {
+                document.getElementById("genre1").checked = top_genre == genre1;
+                document.getElementById("genre2").checked = top_genre == genre2;
+                document.getElementById("genre3").checked = top_genre == genre3;
+        }        
+    </script>
+    <form action="{{ url_for('customized_playlist') }}" method="post">
+    <label for="genre">genre:</label><br>
+    <input type="radio" id="genre1" name="genre" value="{{ top_genres[0] }}">
+    <label for="{{ top_genres[0] }}">{{ top_genres[0] }}</label><br>
+    <input type="radio" id="genre2" name="genre" value="{{ top_genres[1] }}">
+    <label for="{{ top_genres[1] }}">{{ top_genres[1] }}</label><br>
+    <input type="radio" id="genre3" name="genre" value="{{ top_genres[2] }}">
+    <label for="{{ top_genres[2] }}">{{ top_genres[2] }}</label><br>
+    <br>
+    <label for="danceability">danceability:</label>
+    <input type="range" name="danceability" value="{{ features['danceability'] }}">
+    <label for="energy">energy:</label>
+    <input type="range" name="energy" value="{{ features['energy'] }}">
+    <label for="speechiness">speechiness</label>
+    <input type="range" name="speechiness" value="{{ features['speechiness'] }}">
+    <label for="acousticness">acousticness:</label>
+    <input type="range" name="acousticness" value="{{ features['acousticness'] }}">
+    <label for="instrumentalness">instrumentalness:</label>
+    <input type="range" name="instrumentalness" value="{{ features['instrumentalness'] }}">
+    <label for="liveness">liveness:</label>
+    <input type="range" name="liveness" value="{{ features['liveness'] }}">
+    <label for="valence">valence:</label>
+    <input type="range" name="valence" value="{{ features['valence'] }}">
+    <label for="tempo">tempo:</label>
+    <input type="range" name="tempo" value="{{ features['tempo'] }}">
+    <div>
+    <div class="playlist">
+    <input type="submit" name="submit" value="Create Playlist" class="btn btn-sm btn-primary" onclick="return displayFunction()">
+    </div>
+    <div id="loader"></div> 
+    </div>
+	</form>
+    
+    <p id="note">Creating your playlist... <br> This can take upto one minute, please be patient.</p>
+    <script type='text/javascript'>
+        function displayFunction() {
+            document.getElementById("loader").style.display = "block";
+            document.getElementById("note").style.display = "block";
+            return true;
+        }
+    </script>
+    </div>
+    
+
+    {% endblock main %}
